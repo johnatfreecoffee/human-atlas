@@ -20,8 +20,14 @@ export interface Part {id:string;name:string;conceptId:string;system:SystemId;ch
 export interface Concept {id:string;name:string;elements:string[]}
 export interface Atlas {version:string;sex?:'male';source?:string;scope?:string;parts:Part[];concepts:Concept[];chunks:{url:string;bytes:number;gzip?:string;gzipBytes?:number}[];triangles:number}
 export type View = 'three-quarter'|'front'|'back'|'side';
-export interface SceneState {inspectorOpen?:boolean;explode:number;visible:SystemId[];selected:string[];isolate:boolean;view:View;rotate:boolean;reset:number}
+export interface SceneState {inspectorOpen?:boolean;explode:number;visible:SystemId[];selected:string[];isolate:boolean;view:View;rotate:boolean;reset:number;classroom:boolean}
 export const DEFAULT_VISIBLE:SystemId[] = ['cardiac','sensory','skeletal','muscular','arterial','venous','nervous','respiratory','digestive','urinary','lymphatic','endocrine','reproductive','connective'];
+const SCHOOL_PART = /penis|testis|testicular|epididym|seminal vesicle|deferent duct|prostate|pudendal|pubic hair/i;
+const SCHOOL_CONCEPT = /penis|testis|testicular|epididym|seminal|deferent|prostate|pudendal|pubic hair|glans|cavernosum|spongiosum|mons pubis/i;
+export function isSchoolHiddenPart(part:{system:string;name:string}){return part.system==='reproductive'||SCHOOL_PART.test(part.name);}
+export function isSchoolHiddenConcept(concept:{name:string;elements:string[]},parts:Map<string,{system:string;name:string}>){if(SCHOOL_CONCEPT.test(concept.name))return true;return concept.elements.some(id=>{const p=parts.get(id);return !!p&&isSchoolHiddenPart(p);});}
+export function isPartShown(part:{id:string;system:SystemId;name:string},state:Pick<SceneState,'classroom'|'isolate'|'visible'|'selected'>){if(state.classroom&&isSchoolHiddenPart(part))return false;if(state.isolate)return state.selected.includes(part.id);return state.visible.includes(part.system)||state.selected.includes(part.id);}
+export function systemsForClassroom(classroom:boolean):SystemId[]{return classroom?DEFAULT_VISIBLE.filter(id=>id!=='reproductive'):DEFAULT_VISIBLE;}
 export const EXPLANATIONS:Record<string,string> = {
  'heart':'A muscular pump in the chest. Its right side sends blood to the lungs; its left side sends blood through the systemic circulation.',
  'liver':'A large organ beneath the right side of the diaphragm. It processes absorbed nutrients, produces bile, and synthesizes many proteins carried in the blood.',

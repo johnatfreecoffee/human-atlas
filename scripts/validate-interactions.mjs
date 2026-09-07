@@ -3,6 +3,7 @@ import {readFile} from 'node:fs/promises';
 import {createExplosionLayout} from '../app/explosion-layout.ts';
 import {PointerTap} from '../app/pointer-tap.ts';
 import {atlasTools} from '../app/agent-tools.ts';
+import {isSchoolHiddenPart} from '../app/anatomy.ts';
 
 for (const file of ['atlas.json']) {
   const atlas=JSON.parse(await readFile(new URL(`../public/models/${file}`,import.meta.url)));
@@ -29,7 +30,12 @@ for (const file of ['atlas.json']) {
   assert.throws(()=>inspect.execute({id:'nonexistent-structure'}));
   assert.equal(selected,previous);
   assert.throws(()=>find.execute({query:' '}));
-  console.log(`${file}: packing at desktop/mobile aspect ratios and search/inspection contracts passed.`);
+  const hidden=atlas.parts.filter(isSchoolHiddenPart);
+  assert.ok(hidden.some(p=>p.system==='reproductive'));
+  assert.ok(hidden.some(p=>/vein/i.test(p.name)));
+  assert.ok(hidden.some(p=>/artery/i.test(p.name)));
+  assert.ok(hidden.every(p=>p.system==='reproductive'||/penis|testis|testicular|epididym|seminal|deferent|prostate|pudendal|pubic hair/i.test(p.name)));
+  console.log(`${file}: packing at desktop/mobile aspect ratios and search/inspection contracts passed. Classroom hides ${hidden.length} parts.`);
 }
 const tap=new PointerTap();
 tap.down(1,10,10,5);assert.equal(tap.up(1,12,11),true);
