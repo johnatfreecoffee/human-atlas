@@ -27,6 +27,7 @@ function ExplodeSlider({id,explode,onExplode,compact}:{id:string;explode:number;
  </div>;
 }
 function classroomFromUrl(){if(typeof window==='undefined')return false;const q=new URLSearchParams(window.location.search);return q.get('classroom')==='1'||q.get('school')==='1';}
+function captureFromUrl(){if(typeof window==='undefined')return false;return new URLSearchParams(window.location.search).get('capture')==='1';}
 export default function Home(){
  const detailTitle=useRef<HTMLHeadingElement>(null),menuTitle=useRef<HTMLHeadingElement>(null),wantSearch=useRef(false);
  const [atlas,setAtlas]=useState<Atlas|null>(null),[state,setState]=useState<SceneState>(()=>{const classroom=classroomFromUrl();return {...initial,classroom,visible:systemsForClassroom(classroom)};}),[progress,setProgress]=useState(0),[error,setError]=useState(''),[panel,setPanel]=useState<'layers'|'search'|null>(null),[details,setDetails]=useState(false),[about,setAbout]=useState(false),[query,setQuery]=useState(''),[chosen,setChosen]=useState<Concept|null>(null),[menu,setMenu]=useState(false),[pinOpen,setPinOpen]=useState(true),[fsOn,setFsOn]=useState(false),[fsOk,setFsOk]=useState(()=>typeof document!=='undefined'&&!!(document.fullscreenEnabled||(document as FsDoc).webkitFullscreenEnabled));
@@ -62,7 +63,7 @@ export default function Home(){
   <div className="system-list">{activeSystems.map(s=><div className={`system-row ${state.visible.includes(s.id)?'enabled':''}`} key={s.id}><Button variant="ghost" className="system-name" title={`Show only ${s.name.toLowerCase()}`} onClick={()=>setState(v=>({...v,visible:[s.id],isolate:false,selected:[]}))}><span className="system-dot" style={{background:s.color}}/>{s.name}<span className="system-count">{counts[s.id]}</span></Button><Switch checked={state.visible.includes(s.id)} onCheckedChange={()=>toggle(s.id)} aria-label={`Show ${s.name.toLowerCase()}`} /></div>)}</div>
   <div className="panel-foot"><span>{visibleCount.toLocaleString()} pieces visible</span><Button variant="ghost" onClick={()=>setState(s=>({...s,visible:[],selected:[],isolate:false}))}>Hide all</Button></div>
  </>;
- return <main className={`studio${pinOpen?'':' pin-collapsed'}`}>
+ return <main className={`studio${pinOpen?'':' pin-collapsed'}${captureFromUrl()?' capture':''}`}>
   {atlas&&<AnatomyScene atlas={atlas} state={{...state,inspectorOpen:details&&selectedParts.length>0}} onSelect={choosePart} onProgress={n=>{setProgress(n);if(n===100)setError('');}} onError={setError}/>}
   <div className="vignette"/>
   <button type="button" className="mobile-menu-btn" aria-label="Open menu" aria-expanded={menu} aria-controls="atlas-menu" onClick={()=>openMenu(false)}><Menu size={20}/></button>

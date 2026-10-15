@@ -199,3 +199,5 @@ button.explode-pin-toggle:hover{background:#18253610;color:#182536}
  .detail-header{gap:6px}
  .structure-description{font-size:13px!important}
 }
+.studio.capture .vignette,.studio.capture .mobile-menu-btn,.studio.capture .identity,.studio.capture .top-actions,.studio.capture .layers-panel,.studio.capture .search-panel,.studio.capture .view-controls,.studio.capture .scene-caption,.studio.capture .bottom-dock,.studio.capture .studio-footer,.studio.capture .explode-pin,.studio.capture .loading{display:none!important}
+html:has(.studio.capture),html:has(.studio.capture) body,html:has(.studio.capture) #root{background:#fff}
